@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<main>
+    <section>
+        <div class="container">
+
+            <div class="row">
+                <div class="col col-sm-12">
+                    <div class="card">
+                        <h3 class="card-title">Exchange Configuration</h3>
+                        <form action="/config" method="post">
+                            {{ form.hidden_tag() }}
+
+                            {{ form.exchange_fee.label }}
+                            {{ form.exchange_fee() }} 
+                            {% if "exchange_fee" in form.errors %}
+                            <p class="validation-error">{{ form.errors.exchange_fee[-1] }}</p>
+                            {% endif %}
+
+                            {{ form.price_data_expire.label }}
+                            {{ form.price_data_expire() }} 
+                            {% if "price_data_expire" in form.errors %}
+                            <p class="validation-error">{{ form.errors.price_data_expire[-1] }}</p>
+                            {% endif %}
+
+                            {{ form.exchange_rate_expire.label }}
+                            {{ form.exchange_rate_expire() }} 
+                            {% if "exchange_rate_expire" in form.errors %}
+                            <p class="validation-error">{{ form.errors.exchange_rate_expire[-1] }}</p>
+                            {% endif %}
+
+                            {{ form.completed_swap_archive.label }}
+                            {{ form.completed_swap_archive() }} 
+                            {% if "completed_swap_archive" in form.errors %}
+                            <p class="validation-error">{{ form.errors.completed_swap_archive[-1] }}</p>
+                            {% endif %}
+
+                            {{ form.archived_swap_delete.label }}
+                            {{ form.archived_swap_delete() }} 
+                            {% if "completed_swap_archive" in form.errors %}
+                            <p class="validation-error">{{ form.errors.archived_swap_delete[-1] }}</p>
+                            {% endif %}
+                            
+                            {{ form.incomplete_swap_expire.label }}
+                            {{ form.incomplete_swap_expire() }} 
+                            {% if "incomplete_swap_expire" in form.errors %}
+                            <p class="validation-error">{{ form.errors.incomplete_swap_expire[-1] }}</p>
+                            {% endif %}
+
+                            {{ form.swap_cookie_expire.label }}
+                            {{ form.swap_cookie_expire() }} 
+                            {% if "swap_cookie_expire" in form.errors %}
+                            <p class="validation-error">{{ form.errors.swap_cookie_expire[-1] }}</p>
+                            {% endif %}
+
+                            {{ form.minimum_swap_value_dollars.label }}
+                            {{ form.minimum_swap_value_dollars() }} 
+                            {% if "minimum_swap_value_dollars" in form.errors %}
+                            <p class="validation-error">{{ form.errors.minimum_swap_value_dollars[-1] }}</p>
+                            {% endif %}
+
+                            {{ form.maintenance_mode.label }}
+                            {{ form.maintenance_mode() }} 
+                            {% if "maintenance_mode" in form.errors %}
+                            <p class="validation-error">{{ form.errors.maintenance_mode[-1] }}</p>
+                            {% endif %}
+
+                            {{ form.maintenance_list.label }}
+                            {{ form.maintenance_list() }} 
+                            {% if "maintenance_list" in form.errors %}
+                            <p class="validation-error">{{ form.errors.maintenance_list[-1] }}</p>
+                            {% endif %}
+
+                            {{ form.support_email.label }}
+                            {{ form.support_email() }} 
+                            {% if "support_email" in form.errors %}
+                            <p class="validation-error">{{ form.errors.support_email[-1] }}</p>
+                            {% endif %}
+
+                            <button type="submit" class="button-primary button-shadow">Save Config</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

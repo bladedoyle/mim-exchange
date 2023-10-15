@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<main>
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col col-sm-12">
+                    <div class="card">
+                        <h3 class="card-title">Send Lock</h3>
+                        <form action="/lock" method="post">
+                            {{ form.hidden_tag() }}
+                            {{ form.send_lock.label }}
+                            {{ form.send_lock() }} 
+                            {% if "send_lock" in form.errors %}
+                            <p class="validation-error">{{ form.errors.send_lock[-1] }}</p>
+                            {% endif %}
+                            <button type="submit" class="button-primary button-shadow">Save Lock</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+

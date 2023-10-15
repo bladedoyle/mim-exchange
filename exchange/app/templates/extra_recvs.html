@@ -1,0 +1,56 @@
+                {% if swap.extra_recvs == True %}
+                <div class="card">
+                    <h3 class="card-title">Extra Transactions</h3>
+                    <p class="alert alert-warning">
+                        Only 1 transaction per exchange is supported. <br>
+                        Any additional transactions will be automatically refunded.<br>
+                        Please create a new exchange for each transaction.
+                    </p>
+                    <br>
+                    {% for extra_tx in swap.extra_recv_txs %}
+                    {% if swap.extra_recv_txs.index(extra_tx)+1 <= swap.extra_refund_txids|length %}
+                    <table class="alert alert-success">
+                    {% else %}
+                    <table class="alert alert-warning">
+                    {% endif %}
+                        <tbody>
+                            <tr style="border-bottom: 0px;">
+                                <td style="padding: 1px;"> <p><strong>Recv txid</strong></td>
+                                <td style="padding: 1px;"> <p>{{ extra_tx[1] }}</p> </td>
+                            </tr>
+                            <tr style="border-bottom: 0px;">
+                                <td style="padding: 1px;"> <p><strong>Amount</strong></td>
+                                <td style="padding: 1px;"> <p><strong>{{ extra_tx[0]|shortnumber }}</strong></p> </td>
+                            </tr>
+                            <tr style="border-bottom: 0px;">
+                                {% if swap.extra_recv_txs.index(extra_tx)+1 <= swap.extra_refund_txids|length %}
+                                <td style="padding: 1px;"> <p><strong>Refund txid</strong></td>
+                                <td style="padding: 1px;"> <p>{{ swap.extra_refund_txids[swap.extra_recv_txs.index(extra_tx)] }}</p> </td>
+                                {% else %}
+                                <td style="padding: 1px;"> <p><strong>Refund Status</strong></td>
+                                <td style="padding: 1px;"> Refund Pending </td>
+                                {% endif %}
+                            </tr>
+                        </tbody>
+                    </table>
+                    {% endfor %}
+                    {% if swap.refund_address is none %}
+                    <br>
+                    <form action="{{ url_for('swap', swap_id=swap.id) }}" method="post">
+                        {{ form.hidden_tag() }}
+                        <h3 class="card-title">Your {{ swap.swap_from|upper }} Refund Address</h3>
+                        {{ form.refund_address.label() }}
+                        {{ form.refund_address() }}
+                        {% if "refund_address" in form.errors %}
+                        <p class="validation-error">{{ form.errors.refund_address[-1] }}</p>
+                        {% endif %}
+                        <br>
+                        <button type="submit" class="button-primary button-shadow">Set Refund Address</button>
+                    </form>
+                    {% elif swap.extra_recv_txs|length > swap.extra_refund_txids|length %}
+                    <form action="{{ url_for('swap', swap_id=swap.id) }}" method="get">
+                        <center><button type="submit" class="button-primary button-shadow">Update Status</button></center>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endif %}

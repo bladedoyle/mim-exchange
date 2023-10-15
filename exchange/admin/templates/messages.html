@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<main>
+    <section>
+        <div class="container">
+
+            <div class="row">
+                <div class="col col-sm-12">
+                    {% for msg in messages %}
+                    <div class="card">
+                        {{ msg }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

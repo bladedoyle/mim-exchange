@@ -1,0 +1,22 @@
+# Setup Tor SOCKS Proxy
+SocksPort 0.0.0.0:9050
+
+# Setup DNS server
+DNSPort 0.0.0.0:5353
+
+# Setup Tor Transparent Routing
+TransPort 0.0.0.0:9040
+VirtualAddrNetworkIPv4 10.192.0.0/10
+AutomapHostsOnResolve 1
+
+# Exchange Hidden Service
+HiddenServiceDir /opt/tor-router/www
+HiddenServicePort 80 10.1.0.6:80
+
+# Admin Hidden Service
+HiddenServiceDir /opt/tor-router/admin
+HiddenServicePort 80 10.1.0.6:8080
+
+
+# See Also:
+# https://community.torproject.org/onion-services/advanced/client-auth/

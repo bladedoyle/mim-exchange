@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<main>
+    <section>
+        <div class="container">
+
+            <div class="row">
+                <div class="col col-sm-12">
+                    <div class="card">
+                        <center><h6>WARNING:  This is a TESTNET excahnge.<br>All wallets and coins are testnet, do not send mainnet coins to this exchange.</h6></center>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col col-sm-4">
+                    <div class="card">
+                        <h3 class="card-title">Exchange Progress</h3>
+                        <div class="progress-bar">
+                            <span class="progress-bar-green" style="width: 5%;"></span>
+                        </div>
+                        <div class="stepper">
+                            <div class="step">
+                                <p class="step-number" style="background-color:blue">1</p>
+                                <p class="step-title">Choose Exchange Pair</p>
+                                <p>Select the coins you want to convert from and to</p>
+                            </div>
+                            <div class="step">
+                                <p class="step-number" style="background-color:grey">2</p>
+                                <p class="step-title">Provide Address</p>
+                                <p>Provide the destination address</p>
+                            </div>
+                            <div class="step">
+                                <p class="step-number" style="background-color:grey">3</p>
+                                <p class="step-title">Send Coins</p>
+                                <p>Send the coins you want to convert to the address provided</p>
+                            </div>
+                            <div class="step">
+                                <p class="step-number" style="background-color:grey">4</p>
+                                <p class="step-title">Receive Converted Coins</p>
+                                <p>The coins you send will be converted and sent to the destination address</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col col-sm-8">
+                    <div class="card">
+                        <h3 class="card-title">Exchange Now</h3>
+                        <form action="/" method="post">
+                            {{ form.hidden_tag() }}
+                            <div class="form-control-group">
+                                <div class="form-control">
+                                    {{ form.amount.label }}
+                                    {{ form.amount() }} 
+                                    {% if "amount" in form.errors %}
+                                    <p class="validation-error">{{ form.errors.amount[-1] }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="form-control grow-3x">
+                                    {{ form.swap_from.label }}
+                                    {{ form.swap_from() }}
+                                    {% if "swap_from" in form.errors %}
+                                    <p class="validation-error">{{ form.errors.swap_from[-1] }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {{ form.swap_to() }}
+                            {% if "swap_to" in form.errors %}
+                            <p class="validation-error">{{ form.errors.swap_to[-1] }}</p>
+                            {% endif %}
+                            <br>
+                            <button type="submit" class="button-primary button-shadow">Calculate</button>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Exchange Assets</h3>
+                        <div class="column" style="text-align: center;width:100%">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th> Asset </th>
+                                        <th> Status </th>
+                                        <th> Market Price </th>
+                                        <th> Exchange Liquidity </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td> <img style="width:48px;height:48px;vertical-align:middle;" src="data:image/png;base64, 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"> </td>
+                                        {% if "btc" in offline %}
+                                        <td> <p style="color:red">Offline</p> </td>
+                                        {% else %}
+                                        <td> <p style="color:green">Online</p> </td>
+                                        {% endif %}
+                                        <td> ${{ market["btc-usd"]|shortnumber(0) }} </td>
+                                        <td> {{ liquidity["btc"]["available"]|shortnumber }} BTC </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <img style="width:48px;height:48px;vertical-align:middle;" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAADcAAAA3AgMAAADVtTrVAAAACVBMVEX9Yfn/ZgBMTEyh7UIVAAAAAXRSTlMAQObYZgAAAOFJREFUKM+N07GtxCAMBmCDlCY9SzAFI6SAfTIKJfKUh41tzN0rHsUpn+C3TaID+Gul6tXmcntE2w+NVxFei49L7nRQFn9WTydlPaIrHDaLj67wF9Mm1WpVlRpT9isxtKozp1l6Um8klEGAeE3K9dPsRLxWU2VYEyrl1RlTW78UqDz3A/zIDHw5I/DVlS99lGjscD1wGweEApkfqRHSO0Priy9AdOwAt+MAyI4zjItcBd+IaF8fsd8HRz5I6z+80Vb/Zdx8d9LSWTXOWp0Zj+gOw9G5C+NxVmoPOIb2f4Ysex9phr7ir6TfggAAAABJRU5ErkJggg=="></td>
+                                        {% if "xmr" in offline %}
+                                        <td> <p style="color:red">Offline</p> </td>
+                                        {% else %}
+                                        <td> <p style="color:green">Online</p> </td>
+                                        {% endif %}
+                                        <td> ${{ market["xmr-usd"]|shortnumber(2) }} </td>
+                                        <td> {{ liquidity["xmr"]["available"]|shortnumber }} XMR </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <img style="width:48px;height:48px;vertical-align:middle;" src="data:image/png;base64, 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"> </td>
+                                        {% if "zec" in offline %}
+                                        <td> <p style="color:red">Offline</p> </td>
+                                        {% else %}
+                                        <td> <p style="color:green">Online</p> </td>
+                                        {% endif %}
+                                        <td> ${{ market["zec-usd"]|shortnumber(2) }} </td>
+                                        <td> {{ liquidity["zec"]["available"]|shortnumber }} ZEC </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <img style="width:48px;height:48px;vertical-align:middle;" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAByFBMVEUAAAA0XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ01XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00X500XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ00XZ02Xp40XZ00XZ00XZ00XZ01Xp43Xp41Xp00XZ00XZ00Xp01XZ40XZ00XZ00Xp40XZ00XZ00XZ1BZKCDkrZqf6ze4en////7+/xfd6ljeqr6+/yqs8rZ3eY/Y6D6+vxkeqqXosDp6/DGy9q/xdbw8vWGlbhyha/19vm5wNPT1+Lf4uqfqcRSbqX+/v9Ub6WeqMPe4er29/lzhrCHlrnx8vbo6vCWor9le6qutszc3+jQ1OGstMvn6u+gq8VbdKdAY6D5+fvIzdxheam8wtTq7PHBx9eRnb02Xp59jbS8w9Tm6e+wuM3x8/bs7vJ/j7X9/f7d4Oixuc7W2uXCx9eQnb1QbaSNmrtwhK+3vtLU2OOfqsRTb6VXcqaeqcTQ1eG5v9L19vjO09+4v9L4+frY2+Wlr8hheKlgeKmpssrn6e/Z3Oa+xNbHzNvL0N2PdM/EAAAAO3RSTlMAG1WGrMzm67CLWB86id3gkkQQctzjfBQQ8/WPFWrtdAQmydEtXPZrk5sGCrLBwgYDEIqrEBAlyhA5qkKLgV4AAALDSURBVFjDnZf5QxJBFMcHcFEU0AAt1tDQKErssrIasy3zqCRLLTPLsvu2w+7D7svu898NWB8su/OdWfr+wA+89/3szO7MmzeMAXm8virNz3Oq1moCtXWsIgVDYW5TfcMSt+5INMaFamxa6sK+LBDnUHrzcpU/0cKlireukNmTbVyp9pXYn9LVfs5XrUb+tBt7XmvWiuwdGbd+zjs7BP5OUWbPTlO9tv/XOQni5+8yTO3eYx/Delfz71v0G3t7HO/B9v7Fc+0nwIAzVvYtkuD7DRCg3xnTresBrJ/BIQLsE0TbN5TWL/ha+8l/QBhuLW4/tP6HCZAVhuO0swLAzw8SYEQcbzb9G9H+PUT+wyBBN+tDFA1glABjKKOpAIih8DgBjqCMxrw/iKJHJxb9E8dQCs/XyRAKTtIAjkM/b8gBwig4RoBRDKjP1X8YnCLACQzgdcyLQifJPy3x81rmQ6EsAYZlgE2sCoVOEeC0DFDDNBCZKdaSwZkzZ88hgMb8IHKeAFMXcj8XEaCaoUixlhR0Cc4BAS4PWexXrvJKAdeuF903Zm/e4pUBbt+ZKz39LpdL8BJny2bfK/f7BZ/xntV/XzEAzbmQHhgPHz1+QoCnCkCXcyk/m5znfJoAzxUAn3gzvSiuIoWfe8Xb+SUBXqkAHnFBoUPZeK3wh8Ul7Q1VQ+OtAhASF9V35B9XzSAoLuvvCfBB4Y+Bg+VjsS1YsOtTWWK0ANhsP9pGDKzP1sR4RHy4ZiWAL9bEADje5ySAr5a8li3iBuObxG98tyQmQIvzQ+L/aclrQ03WLwngdylNT6I2788C1N++UlrqPxttUtpdqwuVcdlsIwnb9QrGkBH4K3kPaQbk7sqjpxjU1m61vzvJZFJd+1oSTCHpxTMeiKj8eQS6+sai21zYC9oecjDCoaBbt6nc9X+Hef33a10+rwfl/QOtOgmRcZkfYQAAAABJRU5ErkJggg=="> </td>
+                                        {% if "ltc" in offline %}
+                                        <td> <p style="color:red">Offline</p> </td>
+                                        {% else %}
+                                        <td> <p style="color:green">Online</p> </td>
+                                        {% endif %}
+                                        <td> ${{ market["ltc-usd"]|shortnumber(2) }} </td>
+                                        <td> {{ liquidity["ltc"]["available"]|shortnumber }} LTC </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <img style="width:48px;height:48px;vertical-align:middle;" src="data:image/png;base64, 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">  </td>
+                                        {% if "bch" in offline %}
+                                        <td> <p style="color:red">Offline</p> </td>
+                                        {% else %}
+                                        <td> <p style="color:green">Online</p> </td>
+                                        {% endif %}
+                                        <td> ${{ market["bch-usd"]|shortnumber(2) }} </td>
+                                        <td> {{ liquidity["bch"]["available"]|shortnumber }} BCH </td>
+                                    </tr>
+                                    <tr>
+                                        <td>  <img style="width:48px;height:48px;vertical-align:middle;" src="data:image/png;base64, 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">  </td>
+                                        {% if "dash" in offline %}
+                                        <td> <p style="color:red">Offline</p> </td>
+                                        {% else %}
+                                        <td> <p style="color:green">Online</p> </td>
+                                        {% endif %}
+                                        <td> ${{ market["dash-usd"]|shortnumber(2) }} </td>
+                                        <td> {{ liquidity["dash"]["available"]|shortnumber }} DASH </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <img style="width:48px;height:48px;vertical-align:middle;" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAABm1BMVEUAAADCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjLCpjLCpjPCpjPCpjLCpjPCpjPCpjPCpjPBpTLCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPCpjPvgacIAAAAiHRSTlMAHVWHrczlP4vePhJz3XITj/SOa+7taijLyidd9VyVkgq0rsK2kV5bJdyoq8nrbplI4GnvQhBL4o0U8xF2cdrbQ8PWwToxOdRGiB6xG1lRUtgYhbBOnbfSJBYWG6RoC2asMCYB5/3mm/dWs4QcNuOjFUCyGj3fiXRllAZf7GwOu7WvjIo85IZU46buiAAAAq1JREFUWMOll/lfEkEYxl+ONUgRUMsjNMqMwgyVSousrLSwy07pBjNKM8sus+y+3j+73Z0VmYt9F57feOZ9vp+ZnZnlXQCNfP5A0GhCU01GMOD3gSdtC4VRUDi0nZpubpHSTJHWZkI8GoujVvE2V0R7B9bUjp01451d6KruHn1+V8I9j5jo1eX7KHFLu5Xx5B5qHnFvUpHvp+cR+2XCPi95cw51r39TA3x+v9c8Yorbf9L+8UocqAIYwuDBdEWDh4whNaF7K39YHMsI12s4MKIgjFbuT9YFYOmIvM1DR52xGBIAAMfGxLJxZwIJGgCOi5M4kbP9k0gEyKd1wrZHyABInuLrTlvmGdQCJuOmzp4LnK8QpoTCadMb0AMqx+PCRc2Rz6tXIAEqDxx80hpmkATAPodwia+8DFeIALzKvBRfeQ1CVMAs867zlTfgJhWAt0Cx62npIuoBt5l5hzMNyJIBc8zMcGYYpHC6UCjcZbX37tt64IwwU3hoMkA+xhkO8LB+wCP712M3QLFUKjntxHzJVtEZeWKb7QJggfwQn6puQ9nDNjov0WfCNgbJgAAzu/gFQ54MmGLmc4G6SAUsMW+ar/SLF1wLKM8w7wVfuQwQJgHGXjqHYoUrjJjOOAXw6rWT7+ULQ6a1qge8CZuaMwZb3lZey7N84TvLfK8FyPrA10Vsc40O+CjUtdou+a9NvEcYd/pW4p9rcl0sa3NGoh0EwKfPK2LVRm5z8Isb4OvwuqJNqWqbxSu5MLmlpW+GYp+Qa3Ggp54ma756jo22eY03mgDfveV/yLvcaLMNSQ9zULX7Xp6D+oPD2gvaJ08KtOo03PO1PrqsU52tHd8YBRdFYzXWQfjwtBBr6rOPkYkcIW5r9af0ro78+k1NM/kW80GjbEX/GMW//5Z1df8Bxmo8YU28EwsAAAAASUVORK5CYII="> </td>
+                                        {% if "doge" in offline %}
+                                        <td> <p style="color:red">Offline</p> </td>
+                                        {% else %}
+                                        <td> <p style="color:green">Online</p> </td>
+                                        {% endif %}
+                                        <td> ${{ market["doge-usd"]|shortnumber(3) }} </td>
+                                        <td> {{ liquidity["doge"]["available"]|shortnumber }} DOGE </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <img style="width:48px;height:48px;vertical-align:middle;" src="data:image/png;base64, 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"> </td>
+                                        {% if "wow" in offline %}
+                                        <td> <p style="color:red">Offline</p> </td>
+                                        {% else %}
+                                        <td> <p style="color:green">Online</p> </td>
+                                        {% endif %}
+                                        <td> ${{ market["wow-usd"]|shortnumber(3) }} </td>
+                                        <td> {{ liquidity["wow"]["available"]|shortnumber }} WOW </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

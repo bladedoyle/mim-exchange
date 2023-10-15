@@ -1,0 +1,30 @@
+FROM ubuntu:20.04
+
+RUN set -e && \
+    apt-get update -q -y --no-install-recommends && \
+    DEBIAN_FRONTEND="noninteractive" apt-get install -q -y --no-install-recommends \
+      ca-certificates \
+      python3 \
+      python3-pip \
+      bind9-dnsutils curl telnet net-tools nmap \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt
+
+
+RUN groupadd -r user -g 1000 && \
+    adduser --uid 1000 --gid 1000 --system --disabled-password user
+
+USER user
+WORKDIR /home/user
+ENV TZ="UTC"
+
+COPY lib/requirements.txt .
+RUN pip3 install -r requirements.txt
+COPY liquidity_mgr/requirements.txt .
+RUN pip3 install -r requirements.txt
+
+COPY liquidity_mgr/src/ .
+COPY lib lib
+
+CMD ["./liquidity_mgr.py"]

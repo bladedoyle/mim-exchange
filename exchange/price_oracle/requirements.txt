@@ -1,0 +1,3 @@
+pysocks~=1.7
+requests
+redis

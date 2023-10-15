@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<main>
+    <section>
+        <div class="container">
+
+            <div class="row">
+                <div class="col col-sm-12">
+                    <div class="card">
+                        <h3 class="card-title">Terms Of Service</h3>
+                        <div class="card">
+                            <h6>Personal Data</h6>
+                            <p>No KYC is required<br>
+                               No account is required<br>
+                               MIM Exchange does not request or collect any personal data<br>
+                               Exchange records are purged after {{ cfg.completed_swap_archive }} days for your privacy
+                            </p>
+                        </div>
+                        <div class="card">
+                            <h6>Fees</h6>
+                            <p>A {{ cfg.exchange_fee }}% fee is charged on all exchanges</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">FAQ</h3>
+                        <div class="card">
+                            <h6>What happens if I send more (or less) than the amount I requested?</h6>
+                            <p>The exchange will be adjusted to match the amount recieved and executed at the current market rate</p>
+                        </div>
+                        <div class="card">
+                            <h6>What happens if I send multiple transactions for the same exchange?</h6>
+                            <p>Each exchange will accept only 1 transaction.  Any additional transactions will be returned to the refund address you provide</p>
+                        </div>
+                        <div class="card">
+                            <h6>How do I provide a refund address?</h6>
+                            <p>If an exchange fails to execute for any reason, or if multiple transcations are received for a signle exchange you will be prompted to provide a refund address.  If you have already exited the exchange workflow you can "Track" the exchange using the "Exchange ID" to re-join the workflow and get the refund address prompt</p>
+                        </div>                        
+                        <div class="card">
+                            <h6>How are exchange rates calculated?</h6>
+                            <p>Quoted exchange rates are valid for {{ cfg.exchange_rate_expire }} minutes after which the rate will be recalculated based on the market prices when the transaction is received</p>
+                        </div>
+                        <div class="card">
+                            <h6>What fees are charged by MIME?</h6>
+                            <p>A {{ cfg.exchange_fee }}% fee is charged on all exchanges<br>
+                               Transaction fees are paid by the user</p>
+                        </div>
+                        <div class="card">
+                            <h6>Why did I receive slightly more or less than the quoted exchange?</h6>
+                            <p>One or both of the following may apply:<br>
+                               Network transaction fees are paid by the user out of the amount sent<br>
+                               Your sent transaction was confirmed after the quoted exchange rate expired and was recalculated at the new market rate</p>
+                        </div>                        
+                        <div class="card">
+                            <h6>What happens if my transaction takes hours (or days) to be confirmed?</h6>
+                            <p>Exchanges are vaild for {{ cfg.incomplete_swap_expire }} days and will be executed at the current market rate when the send transaction is confirmed on the blockchain</p>
+                        </div>
+                        <div class="card">
+                            <h6>What can I do if I have not received my coins?</h6>
+                            <p>Contact MIM Exchange support at <strong>{{ cfg.support_email }}</strong> and provide the Exchange ID and the Send Transaction ID</p>
+                        </div>
+                        <div class="card">
+                            <h6>What happens if I lose my Exchange ID?</h6>
+                            <p>The Excahnge ID allows you to track the status of your exchange.  If you lose the ID the exchange will execute but you will not be able to look up the details</p>
+                        </div>
+                        <div class="card">
+                            <h6>What are the minimum and maximim exchange amounts?</h6>
+                            <p>The minimum exchangable value is ${{ cfg.minimum_swap_value_dollars }}<br>
+                               The maximim exchange depends on current liquidity<br>
+                               You will be informed of exceeding minimum and maximum values when creating the exchange<br>
+                               If your send transaction exceedes current liquidity the exchange will fail and you will be promped to provide a refund address
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Contact</h3>
+                        <div class="card">
+                            MIM Exchange support can be requested by sending email to: <strong>{{ cfg.support_email }}</strong>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Legal Disclaimer</h3>
+                        <div class="card">
+                            This service may not be used in violation of any laws <br>
+                            This service may not be used by any citizen of the United States of America or any country which prohibits it use<br>
+                            By using MIM Exchange you agree to these terms
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

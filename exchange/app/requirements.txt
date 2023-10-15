@@ -1,0 +1,15 @@
+pycryptodomex~=3.14
+pynacl~=1.4
+pysocks~=1.7
+requests
+ipaddress
+varint
+python-bitcoinrpc
+flask
+flask-wtf
+redis
+base58
+bech32
+qrcode
+Image
+captcha

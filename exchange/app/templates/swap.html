@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<main>
+    <section>
+        <div class="row">
+            {% if swap.recvd_from == False %}
+            <div class="col col-lg-4">
+                <div class="card">
+                    <h3 class="card-title">Exchange Progress</h3>
+                    <div class="progress-bar">
+                        <span class="progress-bar-green" style="width: 50%;"></span>
+                    </div>
+                    <div class="stepper">
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">1</p>
+                            <p class="step-title">Exchange Pair</p>
+                            <p>Converting from {{ swap.swap_from|upper }} to {{ swap.swap_to|upper }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">2</p>
+                            <p class="step-title">Provided Address</p>
+                            <p>{{ swap.swap_to|upper }} destination address {{ swap.swap_to_address|shortaddress }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:blue">3</p>
+                            <p class="step-title">Send Coins</p>
+                            <p>Send {{ swap.swap_from|upper }} to {{ swap.swap_from_address|shortaddress }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:grey">4</p>
+                            <p class="step-title">Receive Converted Coins</p>
+                            <p>The {{ swap.swap_from|upper }} you send will be converted to {{ swap.swap_to|upper }} and sent to {{ swap.swap_to_address|shortaddress }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-lg-8">
+                <div class="card">
+                    <h3 class="card-title">Exchange ID</h3>
+                    <div class="row">
+                        <div class="col col-sm-5">
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.id }}</h4>
+                        </div>
+                        <div class="col col-sm-5 col-sm-offset-1">
+                            <p>This Eachange ID can be used to track the progress of your exchange, look up the details of a completed exchange, or to request support</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Send {{ swap.swap_from|upper }} to</h3>
+                    <h4 class="alert alert-info" style="text-align: center">
+                        <input type="text" 
+                        {% if swap.swap_from_address|length > 64 %}
+                        style="text-align: center;font-size: 14px;" 
+                        {% else %}
+                        style="text-align: center;font-size: 24px;
+                        {% endif %}
+                        name="address" class="input-field" value="{{ swap.swap_from_address }}" readonly>
+                    </h4>
+                    <br>
+                    <center><img src="data:image/jpeg;base64, {{ swap_from_address_qr }}"></center>
+                    <br>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Status</h3>
+                    <h4 class="alert alert-info" style="text-align: center">Waiting For Transaction</h4>
+                        <form action="{{ url_for('swap', swap_id=swap.id) }}" method="get">
+                            <center><button type="submit" class="button-primary button-shadow">Update Status</button></center>
+                        </form>
+                </div>
+                
+                <div class="card">
+                    <div class="row">
+                        <div class="column" style="text-align: center;width:45%">
+                            <h5 style="text-align: center;">You will send {{ swap.swap_from|upper }}</h5>
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.quoted_swap_from_amount|shortnumber }}</h4>
+                        </div>
+                        <div class="column" style="text-align: center;width:10%">&nbsp;&nbsp;</div>
+                        <div class="column" style="text-align: center;width:45%">
+                            <h5 style="text-align: center;">You will receive {{ swap.swap_to|upper }}</h5>
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.quoted_swap_to_amount|shortnumber }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% elif swap.sent_to_confirmed == False and swap.send_failed == False %}
+            <div class="col col-sm-4">
+                <div class="card">
+                    <h3 class="card-title">Exchange Progress</h3>
+                    <div class="progress-bar">
+                        <span class="progress-bar-green" style="width: 75%;"></span>
+                    </div>
+                    <div class="stepper">
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">1</p>
+                            <p class="step-title">Exchange Pair</p>
+                            <p>Converting from {{ swap.swap_from|upper }} to {{ swap.swap_to|upper }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">2</p>
+                            <p class="step-title">Provided Address</p>
+                            <p>{{ swap.swap_to|upper }} destination address {{ swap.swap_to_address|shortaddress }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">3</p>
+                            <p class="step-title">Sent Coins</p>
+                            <p>You sent {{ swap.swap_from_amount|shortnumber }} {{ swap.swap_from|upper }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:blue">4</p>
+                            <p class="step-title">Receive Converted Coins</p>
+                            <p>The {{ swap.swap_from|upper }} you sent has been converted to {{ swap.swap_to|upper }} and sent to {{ swap.swap_to_address|shortaddress }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-sm-8">
+                <div class="card">
+                    <h3 class="card-title">Exchange ID</h3>
+                    <div class="row">
+                        <div class="col col-sm-5">
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.id }}</h4>
+                        </div>
+                        <div class="col col-sm-5 col-sm-offset-1">
+                            <p>This Exchange ID can be used to track the progress of your exchange, look up the details of a completed exchange, or to request support</p>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Status</h3>
+                    <h4 class="alert alert-info" style="text-align: center">Sending your {{ swap.swap_to|upper }}</h4>
+                    <form action="{{ url_for('swap', swap_id=swap.id) }}" method="get">
+                        <center><button type="submit" class="button-primary button-shadow">Update Status</button></center>
+                    </form>
+
+                <div class="card">
+                    <div class="row">
+                        <div class="column" style="text-align: center;width:45%">
+                            <h5 style="text-align: center;">Received {{ swap.swap_from|upper }}</h5>
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.swap_from_amount|shortnumber }}</h4>
+                        </div>
+                        <div class="column" style="text-align: center;width:10%">&nbsp;&nbsp;</div>
+                        <div class="column" style="text-align: center;width:45%">
+                            <h5 style="text-align: center;">Sending {{ swap.swap_to|upper }}</h5>
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.swap_to_amount|shortnumber }}</h4>
+                        </div>
+                    </div>
+                </div>
+                {% elif swap.sent_to_confirmed == True %}
+                <div class="col col-sm-4">
+                    <div class="card">
+                        <h3 class="card-title">Exchange Progress</h3>
+                        <div class="progress-bar">
+                            <span class="progress-bar-green" style="width: 100%;"></span>
+                        </div>
+                        <div class="stepper">
+                            <div class="step">
+                                <p class="step-number" style="background-color:green">1</p>
+                                <p class="step-title">Exchange Pair</p>
+                                <p>Converting from {{ swap.swap_from|upper }} to {{ swap.swap_to|upper }}</p>
+                            </div>
+                            <div class="step">
+                                <p class="step-number" style="background-color:green">2</p>
+                                <p class="step-title">Provided Address</p>
+                                <p>{{ swap.swap_to|upper }} destination address {{ swap.swap_to_address|shortaddress }}</p>
+                            </div>
+                            <div class="step">
+                                <p class="step-number" style="background-color:green">3</p>
+                                <p class="step-title">Sent Coins</p>
+                                <p>You sent {{ swap.swap_from_amount|shortnumber }} {{ swap.swap_from|upper }}</p>
+                            </div>
+                            <div class="step">
+                                <p class="step-number" style="background-color:green">4</p>
+                                <p class="step-title">Received Converted Coins</p>
+                                <p> {{ swap.swap_to|upper }} were sent to {{ swap.swap_to_address|shortaddress }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col col-sm-8">
+
+                    <div class="card">
+                        <h3 class="card-title">Exchange ID</h3>
+                        <div class="row">
+                            <div class="col col-sm-5">
+                                <h4 class="alert alert-info" style="text-align: center">{{ swap.id }}</h4>
+                            </div>
+                            <div class="col col-sm-5 col-sm-offset-1">
+                                <p>This Exchange ID can be used to track the progress of your exchange, look up the details of a completed exchange, or to request support</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Status</h3>
+                        <h4 class="alert alert-success" style="text-align: center">Exchange Completed</h4>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Exchange Details</h3>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td> <h6><strong>Exchanged From</strong></h6> </td>
+                                    <td> <p>{{ swap.swap_from_amount|shortnumber }} {{ swap.swap_from|upper }}</p> </td>
+                                </tr>
+                                <tr>
+                                    <td> <h6><strong>Exchanged To</strong></h6> </td>
+                                    <td> <p>{{ swap.swap_to_amount|shortnumber }} {{ swap.swap_to|upper }}</p> </td>
+                                </tr>
+                                <tr>
+                                    <td> <h6><strong>Executed At</strong></h6> </td>
+                                    <td> <p>{{ swap.swap_executed_ts|timestamp }} UTC</p> </td>
+                                </tr>
+                                <tr>
+                                    <td> <h6><strong>{{ swap.swap_to|upper }} Sent To</strong></h6> </td>
+                                    <td style="word-break:break-all;"> <p6>{{ swap.swap_to_address }}</p> </td>
+                                </tr>
+                                <tr>
+                                    <td> <h6><strong>{{ swap.swap_to|upper }} Transaction ID</strong></h6>
+                                    </td> <td style="word-break:break-all;"> <p>{{ swap.sent_to_txid }}</p>
+                                    </td>
+                                </tr>
+                                {% if swap.refund_address is not none %}
+                                <tr>
+                                    <td> <h6><strong>{{ swap.swap_from|upper }} Refund Address</strong></h6>
+                                    </td> <td style="word-break:break-all;"> <p>{{ swap.refund_address }}</p>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        <br>
+                        <form action="/" method="get">
+                            <center><button type="submit" class="button-primary button-shadow">Start Another Exchange</button></center>
+                        </form>
+                    </div>
+                    {% include 'extra_recvs.html' %}
+                </div>
+            </div>
+            {% elif swap.send_failed == True and swap.refund_address is none %}
+            <div class="col col-sm-4">
+                <div class="card">
+                    <h3 class="card-title">Exchange Progress</h3>
+                    <div class="progress-bar">
+                        <span class="progress-bar-green" style="width: 60%;"></span>
+                    </div>
+                    <div class="stepper">
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">1</p>
+                            <p class="step-title">Exchange Pair</p>
+                            <p>Converting from {{ swap.swap_from|upper }} to {{ swap.swap_to|upper }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">2</p>
+                            <p class="step-title">Provided Address</p>
+                            <p>{{ swap.swap_to|upper }} destination address {{ swap.swap_to_address|shortaddress }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:red">3</p>
+                            <p class="step-title">Exchange Failed</p>
+                            <p>The {{ swap.swap_from_amount|shortnumber }} {{ swap.swap_from|upper }} you sent could not be exchanged</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:blue">4</p>
+                            <p class="step-title">Provide Refund Address</p>
+                            <p>Provide your {{ swap.swap_from|upper }} address to recieve a refund</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:grey">5</p>
+                            <p class="step-title">Receive Refunded Coins</p>
+                            <p>The {{ swap.swap_from|upper }} you sent will be refunded</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-sm-8">
+                <div class="card">
+                    <h3 class="card-title">Exchange ID</h3>
+                    <div class="row">
+                        <div class="col col-sm-5">
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.id }}</h4>
+                        </div>
+                        <div class="col col-sm-5 col-sm-offset-1">
+                            <p>This Exchange ID can be used to track the progress of your exchange, look up the details of a completed exchange, or to request support</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Status</h3>
+                    <h4 class="alert alert-info" style="text-align: center">The exchange failed<br>Provide an address to receive a refund of your {{ swap.swap_from|upper }}</h4>
+                </div>
+                <form action="{{ url_for('swap', swap_id=swap.id) }}" method="post">
+                    {{ form.hidden_tag() }}
+                    <h3 class="card-title">Your {{ swap.swap_from|upper }} Refund Address</h3>
+                    {{ form.refund_address.label() }}
+                    {{ form.refund_address() }}
+                    {% if "refund_address" in form.errors %}
+                    <p class="validation-error">{{ form.errors.refund_address[-1] }}</p>
+                    {% endif %}
+                    <br>
+                    <button type="submit" class="button-primary button-shadow">Set Refund Address</button>
+                </form>            
+            </div>
+            {% elif swap.refund_txid is not none and swap.refund_confirmed == False %}
+            <div class="col col-sm-4">
+                <div class="card">
+                    <h3 class="card-title">Exchange Progress</h3>
+                    <div class="progress-bar">
+                        <span class="progress-bar-green" style="width: 80%;"></span>
+                    </div>
+                    <div class="stepper">
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">1</p>
+                            <p class="step-title">Exchange Pair</p>
+                            <p>Converting from {{ swap.swap_from|upper }} to {{ swap.swap_to|upper }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">2</p>
+                            <p class="step-title">Provided Address</p>
+                            <p>{{ swap.swap_to|upper }} destination address {{ swap.swap_to_address|shortaddress }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:red">3</p>
+                            <p class="step-title">Exchange Failed</p>
+                            <p>The {{ swap.swap_from_amount|shortnumber }} {{ swap.swap_from|upper }} you sent could not be exchanged</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">4</p>
+                            <p class="step-title">Provided Refund Address</p>
+                            <p>Provide your {{ swap.swap_from|upper }} address to recieve a refund</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:blue">5</p>
+                            <p class="step-title">Receive Refunded Coins</p>
+                            <p>The {{ swap.swap_from|upper }} you sent is being refunded</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-sm-8">
+                <div class="card">
+                    <h3 class="card-title">Exchange ID</h3>
+                    <div class="row">
+                        <div class="col col-sm-5">
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.id }}</h4>
+                        </div>
+                        <div class="col col-sm-5 col-sm-offset-1">
+                            <p>This Exchange ID can be used to track the progress of your exchange, look up the details of a completed exchange, or to request support</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Status</h3>
+                    <h4 class="alert alert-info" style="text-align: center">Refunding your {{ swap.swap_from|upper }}</h4>
+                    <form action="{{ url_for('swap', swap_id=swap.id) }}" method="get">
+                        <center><button type="submit" class="button-primary button-shadow">Update Status</button></center>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="row">
+                        <div class="column" style="text-align: center;width:45%">
+                            <h5 style="text-align: center;">Received {{ swap.swap_from|upper }}</h5>
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.swap_from_amount|shortnumber }}</h4>
+                        </div>
+                        <div class="column" style="text-align: center;width:10%">&nbsp;&nbsp;</div>
+                        <div class="column" style="text-align: center;width:45%">
+                            <h5 style="text-align: center;">Sending {{ swap.swap_from|upper }} Refund</h5>
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.swap_from_amount|shortnumber }}</h4>
+                        </div>
+                    </div>
+                </div>          
+            </div>
+            {% elif swap.refund_confirmed == True %}
+            <div class="col col-sm-4">
+                <div class="card">
+                    <h3 class="card-title">Exchange Progress</h3>
+                    <div class="progress-bar">
+                        <span class="progress-bar-green" style="width: 100%;"></span>
+                    </div>
+                    <div class="stepper">
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">1</p>
+                            <p class="step-title">Exchange Pair</p>
+                            <p>Converting from {{ swap.swap_from|upper }} to {{ swap.swap_to|upper }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">2</p>
+                            <p class="step-title">Provided Address</p>
+                            <p>{{ swap.swap_to|upper }} destination address {{ swap.swap_to_address|shortaddress }}</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:red">3</p>
+                            <p class="step-title">Exchange Failed</p>
+                            <p>The {{ swap.swap_from_amount|shortnumber }} {{ swap.swap_from|upper }} you sent could not be exchanged</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">4</p>
+                            <p class="step-title">Provided Refund Address</p>
+                            <p>Provide your {{ swap.swap_from|upper }} address to recieve a refund</p>
+                        </div>
+                        <div class="step">
+                            <p class="step-number" style="background-color:green">5</p>
+                            <p class="step-title">Received Refunded Coins</p>
+                            <p>The {{ swap.swap_from|upper }} you sent were refunded to {{ swap.refund_address|shortaddress }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-sm-8">
+                <div class="card">
+                    <h3 class="card-title">Exchange ID</h3>
+                    <div class="row">
+                        <div class="col col-sm-5">
+                            <h4 class="alert alert-info" style="text-align: center">{{ swap.id }}</h4>
+                        </div>
+                        <div class="col col-sm-5 col-sm-offset-1">
+                            <p>This Exchange ID can be used to track the progress of your exchange, look up the details of a completed exchange, or to request support</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Status</h3>
+                    <h4 class="alert alert-warning" style="text-align: center">Exchange Completed with Refund</h4>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Exchange Details</h3>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td> <h6><strong>Failed to Exchange From</strong></h6> </td>
+                                <td> <p>{{ swap.swap_from_amount|shortnumber }} {{ swap.swap_from|upper }}</p> </td>
+                            </tr>
+                            <tr>
+                                <td> <h6><strong>Refund Sent To</strong></h6> </td>
+                                <td style="word-break:break-all;"> <p6>{{ swap.refund_address }}</p> </td>
+                            </tr>
+                            <tr>
+                                <td> <h6><strong>{{ swap.swap_from|upper }} Refund Transaction ID</strong></h6>
+                                </td> <td style="word-break:break-all;"> <p>{{ swap.refund_txid }}</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <form action="/" method="get">
+                        <center><button type="submit" class="button-primary button-shadow">Start Another Exchange</button></center>
+                    </form>
+            </div>
+            {% include 'extra_recvs.html' %}
+            {% endif %}
+        </div>
+    </section>
+    {% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<main>
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col col-sm-12">
+                    <div class="card">
+                        <h3 class="card-title">{{ type }} Exchanges</h3>
+
+                        {% for id, swap in swaps.items() %}
+                        <table>
+                            <tr>
+                                <th align="center" colspan="2"> <h6><strong><a href="{{ url_for('swap', swap_id=id) }}">Transaction History</a></strong></h6> </td>
+                            </tr>
+                            <tbody>
+                                {% for k, v in swap.items() %}
+                                <tr>
+                                    <td> <h6><strong>{{ k }}</strong></h6> </td>
+                                    <td style="word-break:break-all;"> <p>{{ v }}</p> </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <br>
+                        <hr>
+                        <br>
+                        {% endfor %}                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+

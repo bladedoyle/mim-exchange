@@ -1,0 +1,11 @@
+pysocks~=1.7
+pycryptodomex~=3.14
+pynacl~=1.4
+requests
+ipaddress
+varint
+python-bitcoinrpc
+python-monerorpc
+base58
+bech32
+pytz

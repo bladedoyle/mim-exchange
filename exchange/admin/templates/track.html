@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<main>
+    <section>
+        <div class="container">
+
+            <div class="row">
+                <div class="col col-sm-8">
+                    <div class="card">
+                        <h3 class="card-title">Enter Exchange ID to Track</h3>
+                        <form action="/track" method="post">
+                            {{ form.hidden_tag() }}
+                            {{ form.swap_id.label }}
+                            {{ form.swap_id() }} 
+                            {% if "swap_id" in form.errors %}
+                            <p class="validation-error">{{ form.errors.swap_id[-1] }}</p>
+                            {% endif %}
+                            <button type="submit" class="button-primary button-shadow">Track Exchange</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

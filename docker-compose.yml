@@ -1,0 +1,626 @@
+---
+version: '3.4'
+
+networks:
+  fe:
+    driver: bridge
+    internal: false
+    ipam:
+      driver: default
+      config:
+        - subnet: "10.0.0.0/24"
+          gateway: "10.0.0.1"
+  exchange:
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: "10.1.0.0/24"
+          gateway: "10.1.0.1"
+  be:
+    driver: bridge
+    internal: true
+
+
+volumes:
+  bitcoind: 
+    name: bitcoind-${NETWORK}
+  monerod:
+    name: monerod-${NETWORK}
+  wownero:
+    name: wownero-${NETWORK}
+  monero_wallet:
+    name: monero_wallet-${NETWORK}
+  wownero_wallet:
+    name: wownero_wallet-${NETWORK}
+  exchange:
+    name: exchange-${NETWORK}
+  bitcoincash:
+    name: bitcoincash-${NETWORK}
+  litecoin:
+    name: litecoin-${NETWORK}
+  dogecoin:
+    name: dogecoin-${NETWORK}
+  zcash:
+    name: zcash-${NETWORK}
+  dash:
+    name: dash-${NETWORK}
+
+
+services:
+  tor:
+    image: tor:latest
+    build:
+      context: tor
+      args:
+        - TOR_GIT_TAG=${TOR_GIT_TAG}
+        - ADDRESSES=${NETWORK}
+    container_name: tor
+    networks:
+      fe:
+        ipv4_address: 10.0.0.2
+      exchange:
+        ipv4_address: 10.1.0.2
+    cap_add:
+      - NET_ADMIN
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+
+  monerod:
+    image: monero:latest
+    build:
+      context: nodes/monero
+      args:
+        - MONERO_GIT_TAG=${MONERO_GIT_TAG}
+    container_name: monerod
+    networks:
+      fe:
+        ipv4_address: 10.0.0.3
+      exchange:
+        ipv4_address: 10.1.0.3
+    dns:
+      - 10.0.0.2
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    ports:
+      - 18080:18080/tcp  # p2p mainnet
+      - 38081:38081
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - monerod:/home/monero/.bitmonero:rw
+      - /dev/null:/home/monero/.bitmonero/bitmonero.log:rw
+      - /dev/hugepages:/dev/hugepages:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+    healthcheck:
+      test: /healthcheck_node.sh
+      interval: 1m
+      retries: 999
+    command: /entrypoint.sh
+
+
+  wownero:
+    image: wownero:latest
+    build:
+      context: nodes/wownero
+      args:
+        - WOWNERO_GIT_TAG=${WOWNERO_GIT_TAG}
+    container_name: wownero
+    networks:
+      fe:
+        ipv4_address: 10.0.0.9
+      exchange:
+        ipv4_address: 10.1.0.16
+    dns:
+      - 10.0.0.2
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    ports:
+      - 34567:34567/tcp  # p2p mainnet
+      - 34568:34568/tcp  # rpc
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - wownero:/home/wownero/.wownero:rw
+      - /dev/null:/home/wownero/.wownero/wownero.log:rw
+      - /dev/hugepages:/dev/hugepages:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+    command: /entrypoint.sh
+
+  redis:
+    image: redis:7.0.7
+    container_name: redis
+    networks:
+      be:
+# XXX FOR TESTING XXX REMOVE THIS XXX
+      fe:   
+        ipv4_address: 10.0.0.50
+    ports:
+      - 6379:6379/tcp
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - exchange:/data:rw
+    command: >-
+      --appendonly yes
+      --save 60 1
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+
+  bitcoind:
+    image: bitcoin:latest
+    build:
+      context: nodes/bitcoin
+      args:
+        - BITCOIN_GIT_TAG=${BITCOIN_GIT_TAG}
+    container_name: bitcoind
+    networks:
+      fe:
+        ipv4_address: 10.0.0.4
+      exchange:
+        ipv4_address: 10.1.0.4
+    dns:
+      - 10.0.0.2
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    ports:
+      - 8332:8332/tcp
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - bitcoind:/home/bitcoin/.bitcoin:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+      - REINDEX
+    command: /entrypoint.sh
+
+  zcash:
+    image: zcash:latest
+    build:
+      context: nodes/zcash
+      args:
+        - ZCASH_GIT_TAG=${ZCASH_GIT_TAG}
+    container_name: zcash
+    networks:
+      fe:
+        ipv4_address: 10.0.0.7
+      exchange:
+        ipv4_address: 10.1.0.14
+    dns:
+      - 10.0.0.2
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    ports:
+      - 8233:8233/tcp  # mainnet p2p
+      - 8232:8232/tcp
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - zcash:/home/zcash/.zcash:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+      - REINDEX
+    command: /entrypoint.sh
+
+  litecoind:
+    image: litecoin:latest
+    build:
+      context: nodes/litecoin
+      args:
+        - LITECOIN_VERSION=${LITECOIN_VERSION}
+    container_name: litecoind
+    networks:
+      fe:
+        ipv4_address: 10.0.0.6
+      exchange:
+        ipv4_address: 10.1.0.13
+    dns:
+      - 10.0.0.2
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    ports:
+      - 9333:9333/tcp  # mainnet p2p
+      - 9332:9332/tcp
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - litecoin:/home/litecoin/.litecoin:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+      - REINDEX
+    command: /entrypoint.sh
+
+  # https://docs.bitcoincashnode.org/doc/cli/bitcoind/
+  bitcoincash:
+    image: bitcoincash:latest
+    build:
+      context: nodes/bitcoincash
+      args:
+        - BITCOINCASH_VERSION=${BITCOINCASH_VERSION}
+    container_name: bitcoincash
+    networks:
+      fe:
+        ipv4_address: 10.0.0.5
+      exchange:
+        ipv4_address: 10.1.0.12
+    dns:
+      - 10.0.0.2
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    ports:
+      - 7332:7332/tcp
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - bitcoincash:/home/bitcoin/.bitcoin:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+      - REINDEX
+    command: /entrypoint.sh
+
+  dash:
+    image: dash:latest
+    build:
+      context: nodes/dash
+      args:
+        - DASH_GIT_TAG=${DASH_GIT_TAG}
+    container_name: dash
+    networks:
+      fe:
+        ipv4_address: 10.0.0.8
+      exchange:
+        ipv4_address: 10.1.0.15
+    dns:
+      - 10.0.0.2
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    ports:
+      - 9999:9999/tcp  # mainnet p2p
+      - 9998:9998/tcp
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - dash:/home/dash/.dashcore:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+      - REINDEX
+    command: /entrypoint.sh
+
+  dogecoin:
+    image: dogecoin:latest
+    build:
+      context: nodes/dogecoin
+      args:
+        - DOGECOIN_GIT_TAG=${DOGECOIN_GIT_TAG}
+    container_name: dogecoin
+    networks:
+      fe:
+        ipv4_address: 10.0.0.10
+      exchange:
+        ipv4_address: 10.1.0.17
+    dns:
+      - 10.0.0.2
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    ports:
+      - 22556:22556/tcp  # mainnet p2p
+      - 22555:22555/tcp
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - dogecoin:/home/dogecoin/.dogecoin:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+      - REINDEX
+    command: /entrypoint.sh
+
+
+  monero_wallet:
+    image: monero:latest
+    build:
+      context: nodes/monero
+      args:
+        - MONERO_GIT_TAG=${MONERO_GIT_TAG}
+    container_name: monero_wallet
+    networks:
+      exchange:
+        ipv4_address: 10.1.0.5
+# XXX FOR TESTING XXX REMOVE THIS XXX
+      fe:
+        ipv4_address: 10.0.0.51
+    ports:
+      - 18082:18082/tcp
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - monero_wallet:/home/monero/.bitmonero:rw
+#      - /dev/null:/home/monero/.bitmonero/bitmonero.log:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+    command: /entrypoint_wallet.sh
+
+
+  wownero_wallet:
+    image: wownero:latest
+    build:
+      context: nodes/wownero
+      args:
+        - WOWNERO_GIT_TAG=${WOWNERO_GIT_TAG}
+    container_name: wownero_wallet
+    networks:
+      exchange:
+        ipv4_address: 10.1.0.18
+# XXX FOR TESTING XXX REMOVE THIS XXX
+      fe:
+        ipv4_address: 10.0.0.52
+    ports:
+      - 34566:34566/tcp  # wallet rpc
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    volumes:
+      - wownero_wallet:/home/wownero/.wownero:rw
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 30s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+      - WALLET_PASS=${WALLET_PASS}
+      - NETWORK=${NETWORK}
+    command: /entrypoint_wallet.sh
+
+
+  nginx_fe:
+    image: nginx_fe:latest
+    build:
+      context: nginx
+    container_name: nginx_fe
+    networks:
+      exchange:
+        ipv4_address: 10.1.0.6
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    restart: unless-stopped
+    
+  price_oracle:
+    image: price_oracle:latest
+    build:
+      context: exchange
+      dockerfile: Dockerfile.price_oracle
+    container_name: price_oracle
+    networks:
+      exchange:
+        ipv4_address: 10.1.0.7
+      be:
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 3s
+    restart: unless-stopped
+
+  liquidity_mgr:
+    image: liquidity_mgr:latest
+    build:
+      context: exchange
+      dockerfile: Dockerfile.liquidity_mgr
+    container_name: liquidity_mgr
+    networks:
+      exchange:
+        ipv4_address: 10.1.0.8
+      be:
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 3s
+    restart: unless-stopped
+
+  node_monitor:
+    image: node_monitor:latest
+    build:
+      context: exchange
+      dockerfile: Dockerfile.node_monitor
+    container_name: node_monitor
+    networks:
+      exchange:
+        ipv4_address: 10.1.0.19
+      be:
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 3s
+    restart: unless-stopped
+
+  webui:
+    image: exchange:latest
+    build:
+      context: exchange
+      dockerfile: Dockerfile.app
+    container_name: webui
+    networks:
+      exchange:
+        ipv4_address: 10.1.0.9
+      be:
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 3s
+    restart: unless-stopped
+    command:
+      [
+        "uwsgi",
+        "--socket=0.0.0.0:5000",  # XXX TODO FOR TESTING - REMOVE
+#        "--socket=10.1.0.9:5000",
+        "--uid=uwsgi",
+        "--plugins=python3",
+        "--wsgi=app:app",
+      ]
+
+  admin:
+    image: admin:latest
+    build:
+      context: exchange
+      dockerfile: Dockerfile.admin
+    container_name: admin
+    networks:
+      exchange: 
+        ipv4_address: 10.1.0.10
+      be:
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    ports:
+      - 5002:5002/tcp
+# XXX FOR TESTING XXX REMOVE THIS XXX
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    stop_grace_period: 3s
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_started
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+    command:
+      [
+        "uwsgi",
+        "--socket=0.0.0.0:5000",  # XXX For testing only - REMOVE
+#        "--socket=10.1.0.10:5000",
+        "--uid=uwsgi",
+        "--plugins=python3",
+        "--wsgi=app:app",
+      ]
+
+  mime:
+    image: exchange:latest
+    build:
+      context: exchange
+      dockerfile: Dockerfile.app
+    container_name: mime
+    networks:
+      exchange:
+        ipv4_address: 10.1.0.11
+      be:
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "5"
+            max-size: "10m"
+    stop_grace_period: 65s
+    restart: unless-stopped
+    environment:
+      - NODE_RPC_USER=${NODE_RPC_USER}
+      - NODE_RPC_PASS=${NODE_RPC_PASS}
+    command:
+      [
+        "./mime.py",
+      ]
