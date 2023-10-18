@@ -1,6 +1,7 @@
 # Sample Testnet Exchange
 
 Website: [http://mimexxxic7flxfu4bnin7q24eftztpxbox73zjkhb36a2qgvvaxhljid.onion/](http://mimexxxic7flxfu4bnin7q24eftztpxbox73zjkhb36a2qgvvaxhljid.onion/)
+Clearnet Proxy: [http://mimexchange.cc/](http://mimexchange.cc/)
 
 ## Deploy Instructions
 
@@ -9,18 +10,24 @@ Website: [http://mimexxxic7flxfu4bnin7q24eftztpxbox73zjkhb36a2qgvvaxhljid.onion/
      - 12GB memory
      - 8 CPU cores
      - 100GB disk (SSD preferred)
-2. Install Docker and Docker Compose.
-3. Install libraries and tools for Tor vanity addresses:
+2. Install Docker and Docker Compose
+   https://docs.docker.com/engine/install/ubuntu/
+   ```
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sudo sh get-docker.sh
+   sudo usermod -aG docker $USER
+   ```
+4. Install libraries and tools for Tor vanity addresses:
    ```
    sudo apt-get install libsodium-dev basez autoconf
    ```
-4. Clone this git project and subproject(s).
+5. Clone this git project and subproject(s).
    ```
    git clone https://github.com/bladedoyle/mim-exchange.git
    cd mim-exchange
    git submodule update --init --recursive
    ```
-5. Run the following commands:
+6. Run the following commands:
     ```
     cd tor/mkp224o
     ./autogen.sh
@@ -30,16 +37,16 @@ Website: [http://mimexxxic7flxfu4bnin7q24eftztpxbox73zjkhb36a2qgvvaxhljid.onion/
     ./generate_admin.sh
     ./generate_exchange.sh
     ```
-6. Your exchange onion address is found here:
+7. Your exchange onion address is found here:
    ```
     cat tor/cfg/www-testnet/hostname
    ```
-7. Edit .env and set: NETWORK=testnet.
-8. Build Docker Compose containers (this will take a long time):
+8. Edit .env and set: NETWORK=testnet.
+9. Build Docker Compose containers (this will take a long time):
    ```
     docker-compose build
    ```
-9. If it fails due to memory issues, add a swap file and run the docker-compose build command again
+10. If it fails due to memory issues, add a swap file and run the docker-compose build command again
    ```
     sudo dd if=/dev/zero of=/swapfile2 bs=1G count=8
     chmod 0600 /swapfile2
@@ -51,11 +58,11 @@ Website: [http://mimexxxic7flxfu4bnin7q24eftztpxbox73zjkhb36a2qgvvaxhljid.onion/
     sudo swapoff /swapfile2
     sudo rm /swapfile2
    ```
-10. Start the containers in detached mode (this will take a long time for all nodes to sync pruned blockchains):
+11. Start the containers in detached mode (this will take a long time for all nodes to sync pruned blockchains):
     ```
     docker-compose up -d
     ```
-11. Create wallets for the nodes:
+12. Create wallets for the nodes:
     Some nodes automatically create a wallet, while others do not.
     Wallet creation is not yet fully automated, but scripts are available to help. For example:
     ```
@@ -64,13 +71,13 @@ Website: [http://mimexxxic7flxfu4bnin7q24eftztpxbox73zjkhb36a2qgvvaxhljid.onion/
     ./nodes/zcash/create_wallet.sh
     ...
     ```
-12. View all logs in real-time:
+13. View all logs in real-time:
     ```
     docker-compose logs -f
     ```
-13. Open the Tor browser and go to your exchange onion address.
+14. Open the Tor browser and go to your exchange onion address.
 
 ## Donations
 More Donations == More Coffee == More Code
 
-XMR: 43i7q6hVrMdgY21RH7nMghSPA6s5jjGXDeEmLjL3pNFfD1XBYqf6hJpWVabfGJ5ydJKdaBjKdFvMe1kaKRj5w7Ao7q7mK8v
+XMR: 43MgMFmpmPmHUG1RFyDr5wZH3FpTbaiHSJUUGMAosG639p3L1uV1et2C6SBKjuV8QpE9Dcb5fK3GiWcR5bDfvkqWM6kkmij
