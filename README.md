@@ -12,7 +12,7 @@ Website: [http://mimexxxic7flxfu4bnin7q24eftztpxbox73zjkhb36a2qgvvaxhljid.onion/
 2. Install Docker and Docker Compose.
 3. Install libraries and tools for Tor vanity addresses:
    ```
-   sudo apt-get install libsodium-dev basez
+   sudo apt-get install libsodium-dev basez autoconf
    ```
 4. Clone this git project and subproject(s).
    ```
@@ -22,9 +22,13 @@ Website: [http://mimexxxic7flxfu4bnin7q24eftztpxbox73zjkhb36a2qgvvaxhljid.onion/
    ```
 5. Run the following commands:
     ```
-    make -j4 -C tor/mkp224o/
-    ./tor/generate_admin.sh
-    ./tor/generate_exchange.sh
+    cd tor/mkp224o
+    ./autogen.sh
+    ./configure
+    make -j4
+    cd ..
+    ./generate_admin.sh
+    ./generate_exchange.sh
     ```
 6. Your exchange onion address is found here:
    ```
@@ -35,7 +39,18 @@ Website: [http://mimexxxic7flxfu4bnin7q24eftztpxbox73zjkhb36a2qgvvaxhljid.onion/
    ```
     docker-compose build
    ```
-9. If it fails due to memory issues, run the command again until it succeeds.
+9. If it fails due to memory issues, add a swap file and run the docker-compose build command again
+   ```
+    sudo dd if=/dev/zero of=/swapfile2 bs=1G count=8
+    chmod 0600 /swapfile2
+    sudo mkswap /swapfile2
+    sudo swapon /swapfile2
+   ```
+   And remove the extra swap after building
+   ```
+    sudo swapoff /swapfile2
+    sudo rm /swapfile2
+   ```
 10. Start the containers in detached mode (this will take a long time for all nodes to sync pruned blockchains):
     ```
     docker-compose up -d
